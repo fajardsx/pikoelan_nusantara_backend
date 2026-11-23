@@ -37,8 +37,10 @@ MenuCategory.belongsTo(Tenant, { foreignKey: 'tenantId', as: 'tenant' });
 Tenant.hasMany(MenuItem, { foreignKey: 'tenantId', as: 'menuItems' });
 MenuItem.belongsTo(Tenant, { foreignKey: 'tenantId', as: 'tenant' });
 
-MenuCategory.hasMany(MenuItem, { foreignKey: 'categoryId', as: 'items' });
-MenuItem.belongsTo(MenuCategory, { foreignKey: 'categoryId', as: 'category' });
+// New many-to-many association between MenuItem and MenuCategory
+const MenuItemCategory = require('./menuItemCategory');
+MenuItem.belongsToMany(MenuCategory, { through: MenuItemCategory, foreignKey: 'menuItemId', otherKey: 'menuCategoryId', as: 'categories' });
+MenuCategory.belongsToMany(MenuItem, { through: MenuItemCategory, foreignKey: 'menuCategoryId', otherKey: 'menuItemId', as: 'items' });
 
 // Promo Codes
 Tenant.hasMany(PromoCode, { foreignKey: 'tenantId', as: 'promoCodes' });

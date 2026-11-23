@@ -175,6 +175,7 @@ const createMenuItem = async (req, res) => {
       price,
       originalPrice,
       categoryId,
+      categoryIds,
       isAvailable,
       isFavorite,
       isBanner,
@@ -198,7 +199,6 @@ const createMenuItem = async (req, res) => {
 
     const item = await MenuItem.create({
       tenantId: req.user.tenantId,
-      categoryId: categoryId || null,
       name,
       description: description || null,
       price,
@@ -212,6 +212,14 @@ const createMenuItem = async (req, res) => {
       isBanner: isBanner === "true" || isBanner === true,
       sortOrder: sortOrder || 0,
     });
+
+  // Associate categories (many‑to‑many) if provided
+  if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+    await item.setCategories(categoryIds);
+  } else if (categoryId) {
+    // Fallback for legacy single category field
+    await item.setCategories([categoryId]);
+  }
 
     return sendResponse(res, 201, true, "Menu item created successfully", {
       item,
@@ -234,6 +242,7 @@ const updateMenuItem = async (req, res) => {
       price,
       originalPrice,
       categoryId,
+      categoryIds,
       isAvailable,
       isFavorite,
       isBanner,
